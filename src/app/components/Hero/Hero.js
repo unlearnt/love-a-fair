@@ -1,10 +1,22 @@
+"use client"
+
 import Image from 'next/image';
 import backgroundImage from '@/images/nomura_rainbow.png'
 import styles from './hero.module.css'
+import { useRouter } from 'next/navigation'
+import PaymentModal from "@/app/components/payment-modal/PaymentModal";
+import {useState} from "react";
+
 
 export function Hero() {
+
+    const router = useRouter()
+    const [open, setOpen] = useState(false)
+
     return (
         <div className="bg-white w-full overflow-hidden">
+
+            <PaymentModal open={open} setOpen={setOpen}/>
             {/* Banner Section */}
             <div className="text-center py-2 bg-[#C92420] "/>
 
@@ -31,7 +43,7 @@ export function Hero() {
 
                         <div>
                             <div className="flex flex-col space-y-1">
-                                <p className="text-black text-lg">Thu, 29 Feb</p>
+                                <p className="text-black text-lg">Thursday, 29 Feb 2024</p>
                                 <p className="text-black text-lg">11:30am – 2pm</p>
                                 <p className="text-black text-lg">MBFC Level 35 Pantry</p>
                             </div>
@@ -39,6 +51,7 @@ export function Hero() {
 
                         <div className="mt-4">
                             <button
+                                onClick={() => setOpen(true)}
                                 className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition duration-300 ease-in-out">
                                 Get your coupons
                             </button>

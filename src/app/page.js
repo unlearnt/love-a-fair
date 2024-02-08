@@ -11,9 +11,6 @@ export default function Home() {
             <Hero/>
             <Content/>
 
-
-
-
         </main>
     );
 }

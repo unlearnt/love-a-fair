@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import sampleImageOne from '@/images/sample_image1.png'
 import sampleImageTwo from '@/images/sample_image2.png'
+import oogaImage from '@/images/oogachaga.png'
 import {ChevronRightIcon} from "@heroicons/react/24/solid";
 
 
@@ -135,9 +136,28 @@ export default function Content() {
                         Every dollar raised directly contributes to their life-changing work, making a tangible difference in the lives of countless individuals.
                     </p>
 
+
                     <p className="mt-6">
                         Find out more about them here: <a href="https://oogachaga.com/" className="text-blue-500 underline">https://oogachaga.com/</a>
                     </p>
+
+                    <figure className="mt-4 flex flex-row gap-6 md:gap-8">
+                        <Image
+                            src={oogaImage} // Ensure this is correctly imported or defined
+                            // fill
+                            quality={100}
+                            alt="Hero Image"
+                            className="w-full h-full object-cover rounded-xl mt-6"
+                            style={{objectFit: "cover"}}
+                        />
+                    </figure>
+
+
+
+
+
+
+
 
                 </div>
 
