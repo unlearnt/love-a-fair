@@ -77,50 +77,60 @@ export default function Content() {
 
                     <h1 className="mt-8 text-3xl font-bold tracking-tight text-[#C92420] sm:text-4xl">Our vendors</h1>
 
-                    <p className="mt-6 text-xl leading-8 font-bold">
+                    <p className="mt-6 ">
                         Here’s a sneak peek at our current lineup of vendors, with more exciting additions on the horizon!
                     </p>
                     <div className="mt-6 w-full grid grid-cols-3 gap-3 text-lg md:text-xl lg:text-2xl text-black">
-                        <div className="flex items-center gap-2 font-bold text-gray-800">
+
+                        <a href="https://www.onlycreamery.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-gray-600 hover:underline">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
                             Only Creamery
-                        </div>
-                        <div className="flex items-center gap-2 font-bold text-gray-800">
+                        </a>
+
+                        <a href="https://www.amigosyvinos.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-gray-600 hover:underline">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
                             Amigos Y Vinos
-                        </div>
-                        <div className="flex items-center gap-2 font-bold text-gray-800">
+                        </a>
+
+                        <a href="https://heckinunicorn.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-gray-600 hover:underline">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
-                            Heckin Unicorn
-                        </div>
-                        <div className="flex items-center gap-2 font-bold text-gray-800">
+                            Heckin&apos; Unicorn
+                        </a>
+
+                        <a href="https://www.drips.com.sg/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-gray-600 hover:underline">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
                             Drips
-                        </div>
-                        <div className="flex items-center gap-2 font-bold text-gray-800">
+                        </a>
+
+                        <a href="https://www.smol.sg/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-gray-600 hover:underline">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
                             Smol
-                        </div>
-                        <div className="flex items-center gap-2 font-bold text-gray-800">
+                        </a>
+
+                        <div className="text-xs sm:text-xs md:text-lg lg:text-xl flex items-center gap-2 font-bold text-gray-800">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
                             Luna Chang’s Cartoon Portraits
                         </div>
+
+
                         <div className="flex items-center gap-2 font-bold text-gray-800">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
                             Miss G
                         </div>
-                        <div className="flex items-center gap-2 font-bold text-gray-800">
+
+                        <a href="https://www.selfiebox.com.sg/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-gray-600 hover:underline">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
                             Selfiebox
-                        </div>
-                        <div className="flex items-center gap-2 font-bold text-gray-800">
+                        </a>
+
+                        <a href="https://calypsoul.life/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-gray-600 hover:underline">
                             <ChevronRightIcon className="w-4 h-4 text-black" aria-hidden="true" />
                             Calypsoul Life
-                        </div>
+                        </a>
 
                     </div>
 
-                    <h1 className="mt-16 text-3xl font-bold tracking-tight text-[#C92420] sm:text-4xl">Our beneficiary -  Oogachaga: </h1>
+                    <h1 className="mt-8 text-3xl font-bold tracking-tight text-[#C92420] sm:text-4xl">Our beneficiary - Oogachaga </h1>
 
                     <p className="mt-6">
                         Join us in celebrating love, diversity, and equality by standing with Oogachaga.
@@ -138,7 +148,7 @@ export default function Content() {
 
 
                     <p className="mt-6">
-                        Find out more about them here: <a href="https://oogachaga.com/" className="text-blue-500 underline">https://oogachaga.com/</a>
+                        Find out more about them here: <a target="_blank" rel="noopener noreferrer" href="https://oogachaga.com/" className="text-blue-500 underline">https://oogachaga.com/</a>
                     </p>
 
                     <figure className="mt-4 flex flex-row gap-6 md:gap-8">
