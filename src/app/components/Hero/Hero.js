@@ -52,7 +52,7 @@ export function Hero() {
                         <div className="mt-4">
                             <button
                                 onClick={() => setOpen(true)}
-                                className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition duration-300 ease-in-out">
+                                className="bg-red-600 text-white px-6 py-2 rounded hover:bg-[#C92420] transition duration-300 ease-in-out">
                                 Get your coupons
                             </button>
                         </div>
