@@ -147,9 +147,12 @@ export default function Content() {
                     </p>
 
 
-                    <p className="mt-6">
-                        Find out more about them here: <a target="_blank" rel="noopener noreferrer" href="https://oogachaga.com/" className="text-blue-500 underline">https://oogachaga.com/</a>
-                    </p>
+                    <div className="mt-6 flex flex-wrap sm:flex-nowrap">
+                        <span className="mr-2">Find out more about them here:</span>
+                        <a target="_blank" rel="noopener noreferrer" href="https://oogachaga.com/" className="text-blue-500 underline break-words">
+                            https://oogachaga.com/
+                        </a>
+                    </div>
 
                     <figure className="mt-4 flex flex-row gap-6 md:gap-8">
                         <Image
