@@ -139,7 +139,7 @@ const TransactionPage = () => {
         // Update the transactions array with the new 'collected' value for the transaction with the given id
 
         setTransactions(transactions.map(transaction => {
-            if (transaction.transactionId === id) {
+            if (transaction.transaction_id === id) {
                 // Return a new object with all the original transaction properties, but with 'collected' updated
                 //
 
@@ -268,7 +268,7 @@ const TransactionPage = () => {
                             <input
                                 type="checkbox"
                                 checked={transaction.collected}
-                                onChange={(e) => handleCollectedChange(transaction.transactionId, e.target.checked)}
+                                onChange={(e) => handleCollectedChange(transaction.transaction_id, e.target.checked)}
                                 // disabled // Add this if you don't want users to change the value
                             />
                         </td>

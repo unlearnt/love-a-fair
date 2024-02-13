@@ -12,6 +12,7 @@ export async function GET() {
     const { data, error } = await supabase
         .from('nomura_transactions')
         .select()
+        .order('created_at', { ascending: false })
 
     // return Response.json(data)
     return new Response(JSON.stringify(data), {
