@@ -7,6 +7,7 @@ const TransactionPage = () => {
 
     const [transactions, setTransactions] = useState([]);
     const [eventSource, setEventSource] = useState(null);
+    const eventSourceRef = useRef(null);
 
     const getTransactions = () => {
         fetch('/api/list_transactions', {
@@ -40,22 +41,22 @@ const TransactionPage = () => {
 
         const connectEventSource = () => {
             if (typeof window !== "undefined") {
-                if(!eventSource || eventSource.readyState === eventSource.CLOSED) {
-                    console.log("connecting to event ")
-                    eventSource = new EventSource('/api/list_transactions/stream');
-                    setEventSource(eventSource);
+                if(!eventSourceRef.current || eventSourceRef.current.readyState === EventSource.CLOSED) {
+                    console.log("Connecting to event source...");
+                    eventSourceRef.current = new EventSource('/api/list_transactions/stream');
+
                 }
 
-                eventSource.onmessage = (event) => {
-                    console.log("got new event");
+                eventSourceRef.current.onmessage = (event) => {
+                    console.log("Got new event");
                     getTransactions();
                 };
 
-                eventSource.onerror = (error) => {
+                eventSourceRef.current.onerror = (error) => {
                     console.error('EventSource failed:', error);
-                    eventSource.close();
+                    eventSourceRef.current.close();
                     // Attempt to reconnect after a delay
-                    setTimeout(connectEventSource, 5000); // Reconnect after 5 seconds
+                    setTimeout(connectEventSource, 1000); // Reconnect after 5 seconds
                 };
             }
         };
