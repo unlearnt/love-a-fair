@@ -165,13 +165,6 @@ export default function Content() {
                         />
                     </figure>
 
-
-
-
-
-
-
-
                 </div>
 
 

@@ -11,7 +11,7 @@ export default function PaymentModal(props) {
 
     const [quantity, setQuantity] = useState(1);
     const [email, setEmail] = useState('');
-    const pricePerCoupon = 0.05; // Price per coupon
+    const pricePerCoupon = 5.00; // Price per coupon
     const totalPrice = quantity * pricePerCoupon;
 
     useEffect(() => {

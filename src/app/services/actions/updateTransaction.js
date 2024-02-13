@@ -1,13 +1,13 @@
 'use server'
 
-export async function addTransaction(data) {
+export async function updateTransaction(data) {
 
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    const apiUrl = `${baseUrl}/api/save_transaction`;
+    const apiUrl = `${baseUrl}/api/update_transaction`;
 
-    console.log("add transaction data ", data)
+    console.log("update transaction data ", data)
 
-    console.log("hello fetching apiUrl ", apiUrl)
+    console.log("hello fetching update apiUrl ", apiUrl)
     fetch(apiUrl, {
         method: 'POST',
         headers: {
