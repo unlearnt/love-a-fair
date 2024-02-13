@@ -35,29 +35,6 @@ const TransactionPage = () => {
         getTransactions();
     }, []);
 
-    // useEffect(() => {
-    //     // Initial connection
-    //     connect();
-    //
-    //     // Setup interval to check connection and attempt reconnection if necessary
-    //     reconnectIntervalRef.current = setInterval(() => {
-    //         console.log("check socket ", socketRef.current.readyState)
-    //         if (!socketRef.current || socketRef.current.readyState === WebSocket.CLOSED) {
-    //             console.log('WebSocket is disconnected. Attempting to reconnect...');
-    //             connect();
-    //         }
-    //     }, checkConnectionInterval);
-    //
-    //     // Clean up on component unmount
-    //     return () => {
-    //         if (socketRef.current) {
-    //             socketRef.current.close();
-    //         }
-    //         clearInterval(reconnectIntervalRef.current);
-    //     };
-    // }, []);
-
-
     useEffect(() => {
         let eventSource;
 
@@ -68,8 +45,6 @@ const TransactionPage = () => {
                     eventSource = new EventSource('/api/list_transactions/stream');
                     setEventSource(eventSource);
                 }
-                // eventSource = new EventSource('/api/list_transactions/stream');
-
 
                 eventSource.onmessage = (event) => {
                     console.log("got new event");
@@ -87,8 +62,8 @@ const TransactionPage = () => {
 
         connectEventSource();
 
-        const interval = setInterval(() => {
-            connectEventSource()
+        setInterval(() => {
+            connectEventSource();
         }, 2000);
 
         return () => {
