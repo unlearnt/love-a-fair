@@ -6,6 +6,7 @@ import {updateTransaction} from "@/app/services/actions/updateTransaction";
 const TransactionPage = () => {
 
     const [transactions, setTransactions] = useState([]);
+    const [eventSource, setEventSource] = useState(null);
 
     const getTransactions = () => {
         fetch('/api/list_transactions', {
@@ -39,7 +40,13 @@ const TransactionPage = () => {
 
         const connectEventSource = () => {
             if (typeof window !== "undefined") {
-                eventSource = new EventSource('/api/list_transactions/stream');
+                if(!eventSource || eventSource.readyState === eventSource.CLOSED) {
+                    console.log("connecting to event ")
+                    eventSource = new EventSource('/api/list_transactions/stream');
+                    setEventSource(eventSource);
+                }
+                // eventSource = new EventSource('/api/list_transactions/stream');
+
 
                 eventSource.onmessage = (event) => {
                     console.log("got new event");
@@ -56,6 +63,10 @@ const TransactionPage = () => {
         };
 
         connectEventSource();
+
+        const interval = setInterval(() => {
+            connectEventSource()
+        }, 2000);
 
         return () => {
             if (eventSource) {
