@@ -78,6 +78,7 @@ const TransactionPage = () => {
 
         // Setup interval to check connection and attempt reconnection if necessary
         reconnectIntervalRef.current = setInterval(() => {
+            console.log("check socket ", socketRef.current.readyState)
             if (!socketRef.current || socketRef.current.readyState === WebSocket.CLOSED) {
                 console.log('WebSocket is disconnected. Attempting to reconnect...');
                 connect();
