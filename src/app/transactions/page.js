@@ -8,6 +8,7 @@ const TransactionPage = () => {
     const [transactions, setTransactions] = useState([]);
     const [eventSource, setEventSource] = useState(null);
     const eventSourceRef = useRef(null);
+    const checkConnectionIntervalRef = useRef(null);
 
     const getTransactions = () => {
         fetch('/api/list_transactions', {
@@ -32,44 +33,49 @@ const TransactionPage = () => {
             });
     }
 
+    const connectEventSource = () => {
+        if (typeof window !== "undefined") {
+            if(!eventSourceRef.current || eventSourceRef.current.readyState === EventSource.CLOSED) {
+                console.log("Connecting to event source...");
+                eventSourceRef.current = new EventSource('/api/list_transactions/stream');
+
+            }
+
+            eventSourceRef.current.onmessage = (event) => {
+                console.log("Got new event");
+                getTransactions();
+            };
+
+            eventSourceRef.current.onerror = (error) => {
+                console.error('EventSource failed:', error);
+                eventSourceRef.current.close();
+                // Attempt to reconnect after a delay
+                setTimeout(connectEventSource, 1000); // Reconnect after 5 seconds
+            };
+        }
+    };
+
     useEffect(() => {
         getTransactions();
     }, []);
 
     useEffect(() => {
-        let eventSource;
-
-        const connectEventSource = () => {
-            if (typeof window !== "undefined") {
-                if(!eventSourceRef.current || eventSourceRef.current.readyState === EventSource.CLOSED) {
-                    console.log("Connecting to event source...");
-                    eventSourceRef.current = new EventSource('/api/list_transactions/stream');
-
-                }
-
-                eventSourceRef.current.onmessage = (event) => {
-                    console.log("Got new event");
-                    getTransactions();
-                };
-
-                eventSourceRef.current.onerror = (error) => {
-                    console.error('EventSource failed:', error);
-                    eventSourceRef.current.close();
-                    // Attempt to reconnect after a delay
-                    setTimeout(connectEventSource, 1000); // Reconnect after 5 seconds
-                };
-            }
-        };
-
         connectEventSource();
 
-        setInterval(() => {
-            connectEventSource();
-        }, 2000);
+        // Set up a periodic checker to ensure the connection is alive
+        checkConnectionIntervalRef.current = setInterval(() => {
+            // Attempt to reconnect if the connection is closed
+            if (!eventSourceRef.current || eventSourceRef.current.readyState === EventSource.CLOSED) {
+                connectEventSource();
+            }
+        }, 2000); // Check every 2 seconds
 
         return () => {
-            if (eventSource) {
-                eventSource.close();
+            if (eventSourceRef.current) {
+                eventSourceRef.current.close();
+            }
+            if (checkConnectionIntervalRef.current) {
+                clearInterval(checkConnectionIntervalRef.current);
             }
         };
     }, []);
