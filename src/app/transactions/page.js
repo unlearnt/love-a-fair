@@ -42,7 +42,7 @@ const TransactionPage = () => {
         }
 
         // Create WebSocket connection.
-        socketRef.current = new WebSocket('ws://localhost:3001');
+        socketRef.current = new WebSocket('wss://love-a-fair-5650c26dfecd.herokuapp.com/');
 
         // Connection opened
         socketRef.current.addEventListener('open', function (event) {
