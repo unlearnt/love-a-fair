@@ -61,7 +61,7 @@ const TransactionPage = () => {
         reconnectTimeoutRef.current = setTimeout(() => {
             console.log("Reconnecting to avoid Heroku timeout...");
             connectEventSource();
-        }, 4000); // Adjust as needed, slightly less than Heroku's limit
+        }, 10000); // Adjust as needed, slightly less than Heroku's limit
     };
 
     useEffect(() => {
