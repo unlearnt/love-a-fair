@@ -1,12 +1,16 @@
 "use client"
 
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {updateTransaction} from "@/app/services/actions/updateTransaction";
 
 const TransactionPage = () => {
 
     const [transactions, setTransactions] = useState([]);
-    const [eventSource, setEventSource] = useState(null);
+    // const [eventSource, setEventSource] = useState(null);
+
+    const socketRef = useRef(null);
+    const reconnectIntervalRef = useRef(null);
+    const checkConnectionInterval = 1000; // Check every second
 
     const getTransactions = () => {
         fetch('/api/list_transactions', {
@@ -31,49 +35,104 @@ const TransactionPage = () => {
             });
     }
 
+    const connect = () => {
+        // Clean up any existing WebSocket connection
+        if (socketRef.current) {
+            socketRef.current.close();
+        }
+
+        // Create WebSocket connection.
+        socketRef.current = new WebSocket('ws://localhost:3001');
+
+        // Connection opened
+        socketRef.current.addEventListener('open', function (event) {
+            console.log('WebSocket connection established');
+            socketRef.current.send('Hello Server!');
+        });
+
+        // Listen for messages
+        socketRef.current.addEventListener('message', function (event) {
+            console.log('Message from server', event.data);
+            getTransactions();
+        });
+
+        // Connection closed
+        socketRef.current.addEventListener('close', function (event) {
+            console.log('WebSocket connection closed.');
+        });
+
+        // Connection error
+        socketRef.current.addEventListener('error', function (error) {
+            console.error('WebSocket error:', error);
+            socketRef.current.close(); // Ensure the close event is triggered
+        });
+    };
+
     useEffect(() => {
         getTransactions();
     }, []);
 
     useEffect(() => {
-        let eventSource;
+        // Initial connection
+        connect();
 
-        const connectEventSource = () => {
-            if (typeof window !== "undefined") {
-                if(!eventSource || eventSource.readyState === eventSource.CLOSED) {
-                    console.log("connecting to event ")
-                    eventSource = new EventSource('/api/list_transactions/stream');
-                    setEventSource(eventSource);
-                }
-                // eventSource = new EventSource('/api/list_transactions/stream');
-
-
-                eventSource.onmessage = (event) => {
-                    console.log("got new event");
-                    getTransactions();
-                };
-
-                eventSource.onerror = (error) => {
-                    console.error('EventSource failed:', error);
-                    eventSource.close();
-                    // Attempt to reconnect after a delay
-                    setTimeout(connectEventSource, 5000); // Reconnect after 5 seconds
-                };
+        // Setup interval to check connection and attempt reconnection if necessary
+        reconnectIntervalRef.current = setInterval(() => {
+            if (!socketRef.current || socketRef.current.readyState === WebSocket.CLOSED) {
+                console.log('WebSocket is disconnected. Attempting to reconnect...');
+                connect();
             }
-        };
+        }, checkConnectionInterval);
 
-        connectEventSource();
-
-        const interval = setInterval(() => {
-            connectEventSource()
-        }, 2000);
-
+        // Clean up on component unmount
         return () => {
-            if (eventSource) {
-                eventSource.close();
+            if (socketRef.current) {
+                socketRef.current.close();
             }
+            clearInterval(reconnectIntervalRef.current);
         };
     }, []);
+
+
+    // useEffect(() => {
+    //     let eventSource;
+    //
+    //     const connectEventSource = () => {
+    //         if (typeof window !== "undefined") {
+    //             if(!eventSource || eventSource.readyState === eventSource.CLOSED) {
+    //                 console.log("connecting to event ")
+    //                 eventSource = new EventSource('/api/list_transactions/stream');
+    //                 setEventSource(eventSource);
+    //             }
+    //             // eventSource = new EventSource('/api/list_transactions/stream');
+    //
+    //
+    //             eventSource.onmessage = (event) => {
+    //                 console.log("got new event");
+    //                 getTransactions();
+    //             };
+    //
+    //             eventSource.onerror = (error) => {
+    //                 console.error('EventSource failed:', error);
+    //                 eventSource.close();
+    //                 // Attempt to reconnect after a delay
+    //                 setTimeout(connectEventSource, 5000); // Reconnect after 5 seconds
+    //             };
+    //         }
+    //     };
+    //
+    //     connectEventSource();
+    //
+    //     const interval = setInterval(() => {
+    //         connectEventSource()
+    //     }, 2000);
+    //
+    //     return () => {
+    //         if (eventSource) {
+    //             eventSource.close();
+    //         }
+    //     };
+    // }, []);
 
     const handleCollectedChange = (id, collected) => {
         // Update the transactions array with the new 'collected' value for the transaction with the given id
