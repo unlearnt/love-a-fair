@@ -8,7 +8,7 @@ const TransactionPage = () => {
     const [transactions, setTransactions] = useState([]);
     const [eventSource, setEventSource] = useState(null);
     const eventSourceRef = useRef(null);
-    const checkConnectionIntervalRef = useRef(null);
+    const reconnectTimeoutRef = useRef(null);
 
     const getTransactions = () => {
         fetch('/api/list_transactions', {
@@ -34,25 +34,34 @@ const TransactionPage = () => {
     }
 
     const connectEventSource = () => {
-        if (typeof window !== "undefined") {
-            if(!eventSourceRef.current || eventSourceRef.current.readyState === EventSource.CLOSED) {
-                console.log("Connecting to event source...");
-                eventSourceRef.current = new EventSource('/api/list_transactions/stream');
-
-            }
-
-            eventSourceRef.current.onmessage = (event) => {
-                console.log("Got new event");
-                getTransactions();
-            };
-
-            eventSourceRef.current.onerror = (error) => {
-                console.error('EventSource failed:', error);
-                eventSourceRef.current.close();
-                // Attempt to reconnect after a delay
-                setTimeout(connectEventSource, 1000); // Reconnect after 5 seconds
-            };
+        // Close the existing connection if open
+        if (eventSourceRef.current) {
+            eventSourceRef.current.close();
         }
+
+        console.log("Connecting to event source...");
+        eventSourceRef.current = new EventSource('/api/list_transactions/stream');
+
+        eventSourceRef.current.onmessage = (event) => {
+            console.log("Got new event");
+            getTransactions();
+        };
+
+        eventSourceRef.current.onerror = (error) => {
+            console.error('EventSource failed:', error);
+            eventSourceRef.current.close();
+        };
+
+        // Clear existing timeout to avoid multiple reconnections
+        if (reconnectTimeoutRef.current) {
+            clearTimeout(reconnectTimeoutRef.current);
+        }
+
+        // Set timeout to reconnect before Heroku's timeout limit, e.g., 55 minutes
+        reconnectTimeoutRef.current = setTimeout(() => {
+            console.log("Reconnecting to avoid Heroku timeout...");
+            connectEventSource();
+        }, 2000); // Adjust as needed, slightly less than Heroku's limit
     };
 
     useEffect(() => {
@@ -62,20 +71,12 @@ const TransactionPage = () => {
     useEffect(() => {
         connectEventSource();
 
-        // Set up a periodic checker to ensure the connection is alive
-        checkConnectionIntervalRef.current = setInterval(() => {
-            // Attempt to reconnect if the connection is closed
-            if (!eventSourceRef.current || eventSourceRef.current.readyState === EventSource.CLOSED) {
-                connectEventSource();
-            }
-        }, 2000); // Check every 2 seconds
-
         return () => {
             if (eventSourceRef.current) {
                 eventSourceRef.current.close();
             }
-            if (checkConnectionIntervalRef.current) {
-                clearInterval(checkConnectionIntervalRef.current);
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
             }
         };
     }, []);
