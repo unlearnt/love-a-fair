@@ -9,6 +9,10 @@ const TransactionPage = () => {
     const [eventSource, setEventSource] = useState(null);
     const eventSourceRef = useRef(null);
     const reconnectTimeoutRef = useRef(null);
+    const refreshPageRef = useRef(null);
+
+    // window.location.reload(true);
+
 
     const getTransactions = () => {
         fetch('/api/list_transactions', {
@@ -35,7 +39,7 @@ const TransactionPage = () => {
 
     const connectEventSource = () => {
         // Close the existing connection if open
-        if (eventSourceRef.current) {
+        if (eventSourceRef && eventSourceRef.current) {
             eventSourceRef.current.close();
         }
 
@@ -57,11 +61,22 @@ const TransactionPage = () => {
             clearTimeout(reconnectTimeoutRef.current);
         }
 
+        // clear refresh page timeout
+        if (refreshPageRef.current) {
+            clearTimeout(refreshPageRef.current);
+        }
+
+
         // Set timeout to reconnect before Heroku's timeout limit, e.g., 55 minutes
         reconnectTimeoutRef.current = setTimeout(() => {
             console.log("Reconnecting to avoid Heroku timeout...");
             connectEventSource();
         }, 10000); // Adjust as needed, slightly less than Heroku's limit
+
+        refreshPageRef.current = setTimeout(() => {
+            console.log("refreshing page");
+            window.location.reload(true);
+        }, 60000);
     };
 
     useEffect(() => {
@@ -78,13 +93,17 @@ const TransactionPage = () => {
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
             }
+
+            if(refreshPageRef.current){
+                clearTimeout(refreshPageRef.current);
+            }
         };
     }, []);
 
     const handleCollectedChange = (id, collected) => {
         // Update the transactions array with the new 'collected' value for the transaction with the given id
 
-        setTransactions(transactions.map(transaction => {
+        if (transactions) setTransactions(transactions.map(transaction => {
             if (transaction.transaction_id === id) {
                 // Return a new object with all the original transaction properties, but with 'collected' updated
                 //
@@ -203,7 +222,7 @@ const TransactionPage = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {transactions.map((transaction) => (
+                {transactions && transactions.map((transaction) => (
                     <tr key={transaction.transaction_id}>
                         <td style={tdStyle}>{transaction.transaction_id}</td>
                         <td style={tdStyle}>{transaction.email}</td>
