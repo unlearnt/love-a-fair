@@ -11,9 +11,6 @@ const TransactionPage = () => {
     const reconnectTimeoutRef = useRef(null);
     const refreshPageRef = useRef(null);
 
-    // window.location.reload(true);
-
-
     const getTransactions = () => {
         fetch('/api/list_transactions', {
             method: 'GET',
@@ -37,68 +34,76 @@ const TransactionPage = () => {
             });
     }
 
-    const connectEventSource = () => {
-        // Close the existing connection if open
-        if (eventSourceRef && eventSourceRef.current) {
-            eventSourceRef.current.close();
-        }
+    useEffect(() => {
 
-        console.log("Connecting to event source...");
-        eventSourceRef.current = new EventSource('/api/list_transactions/stream');
-
-        eventSourceRef.current.onmessage = (event) => {
-            console.log("Got new event");
-            getTransactions();
-        };
-
-        eventSourceRef.current.onerror = (error) => {
-            console.error('EventSource failed:', error);
-            eventSourceRef.current.close();
-        };
-
-        // Clear existing timeout to avoid multiple reconnections
-        if (reconnectTimeoutRef.current) {
-            clearTimeout(reconnectTimeoutRef.current);
-        }
-
-        // clear refresh page timeout
-        if (refreshPageRef.current) {
-            clearTimeout(refreshPageRef.current);
-        }
-
-
-        // Set timeout to reconnect before Heroku's timeout limit, e.g., 55 minutes
-        reconnectTimeoutRef.current = setTimeout(() => {
-            console.log("Reconnecting to avoid Heroku timeout...");
-            connectEventSource();
-        }, 10000); // Adjust as needed, slightly less than Heroku's limit
-
-        refreshPageRef.current = setTimeout(() => {
+        refreshPageRef.current = setInterval(() => {
             console.log("refreshing page");
-            window.location.reload(true);
-        }, 60000);
-    };
+            getTransactions();
+        }, 2000);
+
+
+        return () => {
+            console.log("clearing timeout")
+            if(refreshPageRef.current){
+                clearInterval(refreshPageRef.current);
+            }
+        }
+
+    }, []);
+
+    // const connectEventSource = () => {
+    //     // Close the existing connection if open
+    //     if (eventSourceRef && eventSourceRef.current) {
+    //         eventSourceRef.current.close();
+    //     }
+    //
+    //     console.log("Connecting to event source...");
+    //     eventSourceRef.current = new EventSource('/api/list_transactions/stream');
+    //
+    //     eventSourceRef.current.onmessage = (event) => {
+    //         console.log("Got new event");
+    //         getTransactions();
+    //     };
+    //
+    //     eventSourceRef.current.onerror = (error) => {
+    //         console.error('EventSource failed:', error);
+    //         eventSourceRef.current.close();
+    //     };
+    //
+    //     // Clear existing timeout to avoid multiple reconnections
+    //     if (reconnectTimeoutRef.current) {
+    //         clearTimeout(reconnectTimeoutRef.current);
+    //     }
+    //
+    //     // clear refresh page timeout
+    //     if (refreshPageRef.current) {
+    //         clearTimeout(refreshPageRef.current);
+    //     }
+    //
+    //     // Set timeout to reconnect before Heroku's timeout limit, e.g., 55 minutes
+    //     reconnectTimeoutRef.current = setTimeout(() => {
+    //         console.log("Reconnecting to avoid Heroku timeout...");
+    //         connectEventSource();
+    //     }, 2000); // Adjust as needed, slightly less than Heroku's limit
+    //
+    // };
 
     useEffect(() => {
         getTransactions();
     }, []);
 
-    useEffect(() => {
-        connectEventSource();
-
-        return () => {
-            if (eventSourceRef.current) {
-                eventSourceRef.current.close();
-            }
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current);
-            }
-
-            if(refreshPageRef.current){
-                clearTimeout(refreshPageRef.current);
-            }
-        };
-    }, []);
+    // useEffect(() => {
+    //     connectEventSource();
+    //
+    //     return () => {
+    //         if (eventSourceRef.current) {
+    //             eventSourceRef.current.close();
+    //         }
+    //         if (reconnectTimeoutRef.current) {
+    //             clearTimeout(reconnectTimeoutRef.current);
+    //         }
+    //     };
+    // }, []);
 
     const handleCollectedChange = (id, collected) => {
         // Update the transactions array with the new 'collected' value for the transaction with the given id
