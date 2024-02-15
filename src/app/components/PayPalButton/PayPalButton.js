@@ -16,10 +16,8 @@ const PayPalButton = ({amount, quantity, email}) => {
     console.log("email ", email)
 
     const currency = 'SGD';
-    // PPIL
-    // const clientId = 'AZT6KvntyBHU3HuIO6SrNLCCIBaDutHbq2uv0G_YxGa_3DkxUWD8YJ0EX7UR37woXNK1rLI6MT6XSQOO'
-    // Nomura
-    const clientId = 'AUak5A1K2or96KUvd6IB7R9J01e5VoNGbFXgmbJwt5XoG_0ozoQ1-lN7KhFQS_tQi0zA_RtmFjdIjfUH'
+
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
     const locale = 'en_SG';
 
     let invoiceId;
