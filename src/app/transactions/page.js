@@ -7,9 +7,9 @@ const TransactionPage = () => {
 
     const [transactions, setTransactions] = useState([]);
     const [eventSource, setEventSource] = useState(null);
-    const eventSourceRef = useRef(null);
-    const reconnectTimeoutRef = useRef(null);
     const refreshPageRef = useRef(null);
+    const websocketRef = useRef(null);
+    const reconnectInterval = useRef(null);
 
     const getTransactions = () => {
         fetch('/api/list_transactions', {
@@ -34,12 +34,63 @@ const TransactionPage = () => {
             });
     }
 
-    useEffect(() => {
+    const connectWebSocket = () => {
+        // Initialize WebSocket connection
+        websocketRef.current = new WebSocket("wss://love-a-fair-5650c26dfecd.herokuapp.com/");
 
+        websocketRef.current.onopen = () => {
+            console.log("WebSocket connection established");
+        };
+
+        websocketRef.current.onmessage = (event) => {
+            console.log("Message from server:", event.data);
+            getTransactions();
+        };
+
+        websocketRef.current.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+
+        websocketRef.current.onclose = () => {
+            console.log("WebSocket connection closed. Attempting to reconnect...");
+            websocketRef.current = null;
+            // Attempt to reconnect immediately on unexpected closure
+            connectWebSocket();
+        };
+    };
+
+    useEffect(() => {
+        getTransactions();
+    }, []);
+
+    useEffect(() => {
+        if (!websocketRef.current) {
+            connectWebSocket();
+        }
+
+        // Periodically check if the WebSocket connection is alive and reconnect if necessary
+        reconnectInterval.current = setInterval(() => {
+            if (!websocketRef.current || websocketRef.current.readyState === WebSocket.CLOSED) {
+                console.log("Reconnecting WebSocket...");
+                connectWebSocket();
+            }
+        }, 2000); // Check every 2 seconds
+
+        // Cleanup function
+        return () => {
+            if (websocketRef.current) {
+                websocketRef.current.close();
+            }
+            clearInterval(reconnectInterval.current);
+        };
+    }, []);
+
+    // refresh page
+    useEffect(() => {
         refreshPageRef.current = setInterval(() => {
             console.log("refreshing page");
             getTransactions();
-        }, 2000);
+        }, 30000);
 
 
         return () => {
@@ -51,59 +102,6 @@ const TransactionPage = () => {
 
     }, []);
 
-    // const connectEventSource = () => {
-    //     // Close the existing connection if open
-    //     if (eventSourceRef && eventSourceRef.current) {
-    //         eventSourceRef.current.close();
-    //     }
-    //
-    //     console.log("Connecting to event source...");
-    //     eventSourceRef.current = new EventSource('/api/list_transactions/stream');
-    //
-    //     eventSourceRef.current.onmessage = (event) => {
-    //         console.log("Got new event");
-    //         getTransactions();
-    //     };
-    //
-    //     eventSourceRef.current.onerror = (error) => {
-    //         console.error('EventSource failed:', error);
-    //         eventSourceRef.current.close();
-    //     };
-    //
-    //     // Clear existing timeout to avoid multiple reconnections
-    //     if (reconnectTimeoutRef.current) {
-    //         clearTimeout(reconnectTimeoutRef.current);
-    //     }
-    //
-    //     // clear refresh page timeout
-    //     if (refreshPageRef.current) {
-    //         clearTimeout(refreshPageRef.current);
-    //     }
-    //
-    //     // Set timeout to reconnect before Heroku's timeout limit, e.g., 55 minutes
-    //     reconnectTimeoutRef.current = setTimeout(() => {
-    //         console.log("Reconnecting to avoid Heroku timeout...");
-    //         connectEventSource();
-    //     }, 2000); // Adjust as needed, slightly less than Heroku's limit
-    //
-    // };
-
-    useEffect(() => {
-        getTransactions();
-    }, []);
-
-    // useEffect(() => {
-    //     connectEventSource();
-    //
-    //     return () => {
-    //         if (eventSourceRef.current) {
-    //             eventSourceRef.current.close();
-    //         }
-    //         if (reconnectTimeoutRef.current) {
-    //             clearTimeout(reconnectTimeoutRef.current);
-    //         }
-    //     };
-    // }, []);
 
     const handleCollectedChange = (id, collected) => {
         // Update the transactions array with the new 'collected' value for the transaction with the given id
